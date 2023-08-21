@@ -1,0 +1,25 @@
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+ name: aws-sqs-queue-scaledobject
+ namespace: default
+spec:
+ scaleTargetRef:
+   name: webapp-nodejs
+ pollingInterval: 5 #Interval for polling
+ cooldownPeriod: 10
+ idleReplicaCount: 0 # When idle, scale-in to 0 pods
+ minReplicaCount: 1
+ maxReplicaCount: 3
+ fallback: # Fallback strategy when metrics are unavailable for the apps
+ failureThreshold: 5 #when metrics are unavailable, match the desired state of replicas -> 2
+replicas: 2 #Keep this desired state when metrics are unavailable
+triggers:
+- type: aws-sqs-queue
+  authenticationRef:
+    name: keda-trigger-auth-aws-credentials
+  metadata:
+    queueURL: https://sqs.us-west-2.amazonaws.com/963366896292/VendorMgmtQueue
+    queueLength: "5" #batch size
+    awsRegion: "us-west-2"
+    identityOwner: operator #when node role has required permission
