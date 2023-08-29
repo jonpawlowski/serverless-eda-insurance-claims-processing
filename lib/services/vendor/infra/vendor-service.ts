@@ -6,6 +6,7 @@ import {
   CfnOutput,
   RemovalPolicy,
   aws_ecr_assets as ecr_assets,
+  aws_eks as eks,
   Stack,
 } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
@@ -75,6 +76,35 @@ export class VendorService extends Construct {
     .addOns(addOn)
     .teams()
     .build(scope, id+'-stack');
+
+    const cluster = eks.Cluster.fromClusterAttributes(this, id+'-stack', {
+      clusterName: id+'-stack'
+    });
+
+    cluster.addManifest('KEDA', {
+      apiVersion: 'v1',
+      kind: 'ConfigMap',
+      metadata: {
+        name: 'myconfigmap',
+      },
+      data: {
+        Key: 'value',
+        Another: '123454',
+      },
+    });
+
+    cluster.addManifest('Test', {
+      apiVersion: 'v1',
+      kind: 'ConfigMap',
+      metadata: {
+        name: 'myconfigmap',
+      },
+      data: {
+        Key: 'value',
+        Another: '123454',
+      },
+    });
+
  // get handle to cluster and deploy yml
     new CfnOutput(this, "EventBridge: ", { value: props.bus.eventBusName });
     new CfnOutput(this, "SQS-Queue: ", { value: queue.queueName });
