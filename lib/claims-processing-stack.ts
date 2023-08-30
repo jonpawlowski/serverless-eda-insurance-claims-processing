@@ -72,6 +72,10 @@ export class ClaimsProcessingStack extends Stack {
       bus,
     });
 
+    const vendorService = new VendorService(this, "VendorService", {
+      bus,
+    });
+
     new NotificationsService(this, "NotificationsService", {
       bus,
       customerTable,

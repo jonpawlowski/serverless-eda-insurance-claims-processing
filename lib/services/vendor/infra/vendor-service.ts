@@ -57,7 +57,7 @@ export class VendorService extends Construct {
 
     const queue = ebToSqsConstruct.sqsQueue;
 
-    const asset = new ecr_assets.DockerImageAsset(this, "vendor-service", {
+    const ecrAsset = new ecr_assets.DockerImageAsset(this, "vendor-service", {
       directory: path.join(__dirname, "../app"),
     });
 
@@ -69,42 +69,84 @@ export class VendorService extends Construct {
     };
     
     const addOn = new blueprints.KedaAddOn(kedaParams);
-    
+    const vendorClusterName = id+'-stack';
+
     const blueprint = blueprints.EksBlueprint.builder()
     .account(account)
     .region(region)
     .addOns(addOn)
     .teams()
-    .build(scope, id+'-stack');
+    .build(scope, vendorClusterName);
 
-    const cluster = eks.Cluster.fromClusterAttributes(this, id+'-stack', {
-      clusterName: id+'-stack'
+    const cluster = eks.Cluster.fromClusterAttributes(this, vendorClusterName, {
+      clusterName: vendorClusterName
     });
 
     cluster.addManifest('KEDA', {
-      apiVersion: 'v1',
-      kind: 'ConfigMap',
+      apiVersion: 'mkeda.sh/v1alpha1',
+      kind: 'ScaledObject',
       metadata: {
-        name: 'myconfigmap',
+        name: 'aws-sqs-queue-scaledobject',
+        namespace: 'default',
       },
-      data: {
-        Key: 'value',
-        Another: '123454',
+      spec: {
+        scaleTargetRef: {
+          name: vendorClusterName,
+        },
+        pollingInterval: 5,
+        cooldownPeriod: 10,
+        idleReplicaCount: 0,
+        minReplicaCount: 1,
+        maxReplicaCount: 3,
+        failureThreshold: 5,
+      },
+      replicas: 2,
+      triggers: {
+        type: 'aws-sqs-queue',
+        authenticationRef: {
+          name: 'keda-trigger-auth-aws-credentials',
+        },
+        metadata: {
+          queueURL: queue.queueURL,
+          queueLength: '5',
+          awsRegion: region,
+          identityOwner: 'operator',
+        },
       },
     });
 
-    cluster.addManifest('Test', {
-      apiVersion: 'v1',
-      kind: 'ConfigMap',
+    cluster.addManifest('vendor-service', {
+      apiVersion: 'apps/v1',
+      kind: 'Deployment',
       metadata: {
-        name: 'myconfigmap',
+        name: 'vendor-service',
       },
-      data: {
-        Key: 'value',
-        Another: '123454',
+      spec: {
+        replicas: 2,
+        selector: {
+          matchLabels: {
+            app: 'vendor-service',
+          },
+        },
+        template: {
+          metadata: {
+            labels: {
+              app: 'vendor-service',
+            },
+          },
+          spec: {
+            containers: {
+              name: 'vendor-service',
+              image: ecrAsset.imageUri,
+              ports: {
+                containerPort: 3000,
+              },
+            },
+          },
+        },
       },
     });
-
+    
  // get handle to cluster and deploy yml
     new CfnOutput(this, "EventBridge: ", { value: props.bus.eventBusName });
     new CfnOutput(this, "SQS-Queue: ", { value: queue.queueName });
