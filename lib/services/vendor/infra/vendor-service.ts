@@ -57,10 +57,6 @@ export class VendorService extends Construct {
 
     const queue = ebToSqsConstruct.sqsQueue;
 
-    const ecrAsset = new ecr_assets.DockerImageAsset(this, "vendor-service", {
-      directory: path.join(__dirname, "../app"),
-    });
-
     const kedaParams = {
       podSecurityContextFsGroup: 1001,
       securityContextRunAsGroup: 1001,
@@ -114,6 +110,10 @@ export class VendorService extends Construct {
         },
       },
     });
+    // move to separate file
+    const ecrAsset = new ecr_assets.DockerImageAsset(this, "vendor-service", {
+      directory: path.join(__dirname, "../app"),
+    });
 
     cluster.addManifest('vendor-service', {
       apiVersion: 'apps/v1',
@@ -141,6 +141,12 @@ export class VendorService extends Construct {
               ports: {
                 containerPort: 3000,
               },
+              env: [ {name: 'VENDOR_QUEUE', value: queue.queueURL}, {name: 'BUS_NAME', props.bus.eventBusName}],
+            /*- env:
+              - name: var1
+                value: val1
+              - name: var2
+                value: val2 */
             },
           },
         },
