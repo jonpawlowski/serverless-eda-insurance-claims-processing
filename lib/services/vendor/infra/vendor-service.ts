@@ -12,7 +12,7 @@ import {
 import { Construct } from 'constructs';
 import { EventBus } from "aws-cdk-lib/aws-events";
 import { EventbridgeToSqs } from "@aws-solutions-constructs/aws-eventbridge-sqs";
-import { SettlementEvents } from "../../settlement/infra/settlement-events";
+import { SettlementEvents } from "../../settlement/infra/settlement-service";
 import * as blueprints from '@aws-quickstart/eks-blueprints';
 
 import * as path from "path";
@@ -103,7 +103,7 @@ export class VendorService extends Construct {
           name: 'keda-trigger-auth-aws-credentials',
         },
         metadata: {
-          queueURL: queue.queueURL,
+          queueURL: queue.queueUrl,
           queueLength: '5',
           awsRegion: region,
           identityOwner: 'operator',
@@ -141,7 +141,7 @@ export class VendorService extends Construct {
               ports: {
                 containerPort: 3000,
               },
-              env: [ {name: 'VENDOR_QUEUE', value: queue.queueURL}, {name: 'BUS_NAME', props.bus.eventBusName}],
+              env: [ {name: 'VENDOR_QUEUE', value: queue.queueUrl}, {name: 'BUS_NAME', props.bus.eventBusName}],
             /*- env:
               - name: var1
                 value: val1
