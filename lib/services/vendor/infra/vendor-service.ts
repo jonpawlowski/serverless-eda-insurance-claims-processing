@@ -35,12 +35,12 @@ export class VendorService extends Construct {
     const account = props?.env?.account!;
     const region = props?.env?.region!;
 
-    this.table = new dynamodb.Table(this, "VendorTable", {
+    /*this.table = new dynamodb.Table(this, "VendorTable", {
       partitionKey: { name: "Id", type: dynamodb.AttributeType.STRING, },
       readCapacity: 5,
       writeCapacity: 5,
       removalPolicy: RemovalPolicy.DESTROY, // NOT recommended for production code
-    });
+    });*/
 
     const ebToSqsConstruct = new EventbridgeToSqs(this, 'sqs-construct', {
       existingEventBusInterface: props.bus,
