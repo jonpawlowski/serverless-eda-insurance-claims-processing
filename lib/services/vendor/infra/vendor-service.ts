@@ -32,8 +32,8 @@ export class VendorService extends Construct {
   constructor(scope: Construct, id: string, props: VendorServiceProps) {
     super(scope, id);
 
-    const account = props?.env?.account!;
-    const region = props?.env?.region!;
+    //const account = props?.env?.account!;
+    //const region = props?.env?.region!;
 
     /*this.table = new dynamodb.Table(this, "VendorTable", {
       partitionKey: { name: "Id", type: dynamodb.AttributeType.STRING, },
@@ -68,8 +68,8 @@ export class VendorService extends Construct {
     const vendorClusterName = id+'-stack';
 
     const blueprint = blueprints.EksBlueprint.builder()
-    .account(account)
-    .region(region)
+    .account()
+    .region()
     .addOns(addOn)
     .teams()
     .build(scope, vendorClusterName);
@@ -105,7 +105,6 @@ export class VendorService extends Construct {
         metadata: {
           queueURL: queue.queueUrl,
           queueLength: '5',
-          awsRegion: region,
           identityOwner: 'operator',
         },
       },
