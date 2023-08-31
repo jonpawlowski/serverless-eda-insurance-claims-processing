@@ -69,7 +69,7 @@ export class VendorService extends Construct {
 
     const blueprint = blueprints.EksBlueprint.builder()
     .version(eks.KubernetesVersion.V1_26)
-    //.account()
+    .account('963366896292')
     //.region()
     .addOns(addOn)
     .teams()
@@ -120,6 +120,7 @@ export class VendorService extends Construct {
       kind: 'Deployment',
       metadata: {
         name: 'vendor-service',
+        namespace: 'default',
       },
       spec: {
         replicas: 2,
