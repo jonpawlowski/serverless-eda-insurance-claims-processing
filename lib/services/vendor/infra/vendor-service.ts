@@ -141,7 +141,7 @@ export class VendorService extends Construct {
               ports: {
                 containerPort: 3000,
               },
-              env: [ {name: 'VENDOR_QUEUE', value: queue.queueUrl}, {name: 'BUS_NAME', props.bus.eventBusName}],
+              env: [ {name: 'VENDOR_QUEUE', value: queue.queueUrl}, {name: 'BUS_NAME', value: props.bus.eventBusName}],
             /*- env:
               - name: var1
                 value: val1
