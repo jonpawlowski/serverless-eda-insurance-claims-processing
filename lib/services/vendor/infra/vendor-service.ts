@@ -92,7 +92,8 @@ export class VendorService extends Construct {
 
     const cluster = eks.Cluster.fromClusterAttributes(this, vendorClusterName, {
       clusterName: vendorClusterName,
-      kubectlRoleArn: 'arn:aws:iam::963366896292:role/jp-eksworkernodes',
+      //kubectlRoleArn: 'arn:aws:iam::963366896292:role/jp-eksworkernodes',
+      kubectlProvider,
     });
 
     cluster.addManifest('KEDA', {
@@ -127,7 +128,7 @@ export class VendorService extends Construct {
       },
     });
 
-    /*cluster.addManifest('vendor-service', {
+    cluster.addManifest('vendor-service', {
       apiVersion: 'apps/v1',
       kind: 'Deployment',
       metadata: {
@@ -159,7 +160,7 @@ export class VendorService extends Construct {
           },
         },
       },
-    }); */
+    });
     
  // get handle to cluster and deploy yml
     new CfnOutput(this, "EventBridge: ", { value: props.bus.eventBusName });
