@@ -7,7 +7,7 @@ import {
   RemovalPolicy,
   aws_ecr_assets as ecr_assets,
   aws_eks as eks,
-  iam as iam,
+  aws_iam as iam,
   Stack,
 } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
