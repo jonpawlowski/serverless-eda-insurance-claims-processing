@@ -69,7 +69,7 @@ export class VendorService extends Construct {
 
     const blueprint = blueprints.EksBlueprint.builder()
     .version(eks.KubernetesVersion.V1_26)
-    .account('963366896292')
+    //.account()
     //.region()
     .addOns(addOn)
     .teams()
@@ -80,7 +80,12 @@ export class VendorService extends Construct {
       kubectlRoleArn: 'arn:aws:iam::963366896292:role/jp-eksworkernodes',
     });
 
-    cluster.addManifest('KEDA', {
+    // move to separate file
+    const ecrAsset = new ecr_assets.DockerImageAsset(this, "vendor-service", {
+      directory: path.join(__dirname, "../app"),
+    });
+
+    /*cluster.addManifest('KEDA', {
       apiVersion: 'mkeda.sh/v1alpha1',
       kind: 'ScaledObject',
       metadata: {
@@ -111,10 +116,6 @@ export class VendorService extends Construct {
         },
       },
     });
-    // move to separate file
-    const ecrAsset = new ecr_assets.DockerImageAsset(this, "vendor-service", {
-      directory: path.join(__dirname, "../app"),
-    });
 
     cluster.addManifest('vendor-service', {
       apiVersion: 'apps/v1',
@@ -144,16 +145,11 @@ export class VendorService extends Construct {
                 containerPort: 3000,
               },
               env: [ {name: 'VENDOR_QUEUE', value: queue.queueUrl}, {name: 'BUS_NAME', value: props.bus.eventBusName}],
-            /*- env:
-              - name: var1
-                value: val1
-              - name: var2
-                value: val2 */
             },
           },
         },
       },
-    });
+    }); */
     
  // get handle to cluster and deploy yml
     new CfnOutput(this, "EventBridge: ", { value: props.bus.eventBusName });
