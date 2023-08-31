@@ -68,8 +68,9 @@ export class VendorService extends Construct {
     const vendorClusterName = id+'-stack';
 
     const blueprint = blueprints.EksBlueprint.builder()
-    .account()
-    .region()
+    .version(eks.KubernetesVersion.V1_26)
+    //.account()
+    //.region()
     .addOns(addOn)
     .teams()
     .build(scope, vendorClusterName);
