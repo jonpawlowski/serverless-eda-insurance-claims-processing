@@ -75,14 +75,23 @@ export class VendorService extends Construct {
     .teams()
     .build(scope, vendorClusterName);
 
-    const cluster = eks.Cluster.fromClusterAttributes(this, vendorClusterName, {
-      clusterName: vendorClusterName,
-      kubectlRoleArn: 'arn:aws:iam::963366896292:role/jp-eksworkernodes',
-    });
-
     // move to separate file
     const ecrAsset = new ecr_assets.DockerImageAsset(this, "vendor-service", {
       directory: path.join(__dirname, "../app"),
+    });
+
+    //const handlerRole = iam.Role.fromRoleArn(this, 'HandlerRole', 'arn:aws:iam::123456789012:role/lambda-role');
+    // get the serivceToken from the custom resource provider
+    //const functionArn = lambda.Function.fromFunctionName(this, 'ProviderOnEventFunc', 'ProviderframeworkonEvent-XXX').functionArn;
+    const kubectlProvider = eks.KubectlProvider.fromKubectlProviderAttributes(this, 'KubectlProvider', {
+      functionArn: 'arn:aws:iam::963366896292:role/jp-eksworkernodes',
+      kubectlRoleArn: 'arn:aws:iam::963366896292:role/jp-eksworkernodes',
+      handlerRole: 'arn:aws:iam::963366896292:role/jp-eksworkernodes',
+    });
+
+    const cluster = eks.Cluster.fromClusterAttributes(this, vendorClusterName, {
+      clusterName: vendorClusterName,
+      kubectlRoleArn: 'arn:aws:iam::963366896292:role/jp-eksworkernodes',
     });
 
     cluster.addManifest('KEDA', {
