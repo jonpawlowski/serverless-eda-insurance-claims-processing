@@ -7,6 +7,7 @@ import {
   RemovalPolicy,
   aws_ecr_assets as ecr_assets,
   aws_eks as eks,
+  iam as iam,
   Stack,
 } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
@@ -80,13 +81,13 @@ export class VendorService extends Construct {
       directory: path.join(__dirname, "../app"),
     });
 
-    //const handlerRole = iam.Role.fromRoleArn(this, 'HandlerRole', 'arn:aws:iam::123456789012:role/lambda-role');
+    const handlerRole = iam.Role.fromRoleArn(this, 'HandlerRole', 'arn:aws:iam::963366896292:role/jp-eksworkernodes');
     // get the serivceToken from the custom resource provider
     //const functionArn = lambda.Function.fromFunctionName(this, 'ProviderOnEventFunc', 'ProviderframeworkonEvent-XXX').functionArn;
     const kubectlProvider = eks.KubectlProvider.fromKubectlProviderAttributes(this, 'KubectlProvider', {
       functionArn: 'arn:aws:iam::963366896292:role/jp-eksworkernodes',
       kubectlRoleArn: 'arn:aws:iam::963366896292:role/jp-eksworkernodes',
-      handlerRole: 'arn:aws:iam::963366896292:role/jp-eksworkernodes',
+      handlerRole,
     });
 
     const cluster = eks.Cluster.fromClusterAttributes(this, vendorClusterName, {
