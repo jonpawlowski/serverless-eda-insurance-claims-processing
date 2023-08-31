@@ -85,7 +85,7 @@ export class VendorService extends Construct {
       directory: path.join(__dirname, "../app"),
     });
 
-    /*cluster.addManifest('KEDA', {
+    cluster.addManifest('KEDA', {
       apiVersion: 'mkeda.sh/v1alpha1',
       kind: 'ScaledObject',
       metadata: {
@@ -117,7 +117,7 @@ export class VendorService extends Construct {
       },
     });
 
-    cluster.addManifest('vendor-service', {
+    /*cluster.addManifest('vendor-service', {
       apiVersion: 'apps/v1',
       kind: 'Deployment',
       metadata: {
