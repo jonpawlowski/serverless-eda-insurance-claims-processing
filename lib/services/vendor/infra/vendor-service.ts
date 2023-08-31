@@ -76,7 +76,8 @@ export class VendorService extends Construct {
     .build(scope, vendorClusterName);
 
     const cluster = eks.Cluster.fromClusterAttributes(this, vendorClusterName, {
-      clusterName: vendorClusterName
+      clusterName: vendorClusterName,
+      kubectlRoleArn: 'arn:aws:iam::963366896292:role/eksClusterRole',
     });
 
     cluster.addManifest('KEDA', {
